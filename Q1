@@ -1,1 +1,29 @@
+from flask import Flask, request, jsonify
+import requests
 
+app = Flask(name)
+
+@app.route('/numbers', methods=['GET'])
+def get_numbers():
+    urls = request.args.get('urls')
+    if (urls, list):
+        return jsonify({'error'- 'Invalid'}), 400
+
+    unique_numbers = []
+
+    def fetch_numbers(url):
+        try:
+            rs = requests.get(url, timeout=0.5)
+
+            if rs == 200 and isinstance(rs.json().get('numbers'), list):
+                unique_numbers.extend(rs.json().get('numbers'))
+        except requests.exceptions.RequestException as error:
+            print(f"Error fetching data from {url}: {error}")
+
+    [fetch_numbers(url) for url in urls]
+
+    sorted_unique_numbers = sorted(list(set(unique_numbers)))
+    return jsonify({'numbers': sorted_unique_numbers})
+
+if name == 'main':
+    app.run(port=8008)
